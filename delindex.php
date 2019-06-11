@@ -1,7 +1,9 @@
 <?php
+session_start();
 
 include 'config.php';
 include 'conn.php';
+include 'delconn.php';
 
 
 $empty_fields = false;
@@ -10,12 +12,12 @@ $invalid_symbols = false;
 $invalid_email = false;
 $taken = false;
 
-$dbusername = "root";
-$dbpassword = "";
-$dbhostname = "localhost";
-$dbname = "login";
+$login_empty = false;
+$login_invalid_name = false;
+$login_invalid_password = false;
 
-$conn1 = mysqli_connect($dbhostname,$dbusername,$dbpassword,$dbname);
+
+
 
 
 $username = isset($_GET['username']) ? $_GET['username'] : '';
@@ -53,6 +55,10 @@ switch($action){
         
     
     }else{
+
+
+
+
         $sql = "INSERT INTO deltest(username, password, email) VALUES(:username, :password, :email)";
         $success = false;
 
@@ -80,6 +86,28 @@ switch($action){
             <?php
 
         }
+
+       $sql2 = "INSERT INTO profileimg (userid, status) VALUES(:userid, :status);";
+
+       try{
+          $stmt2 = $conn -> prepare($sql2);
+          $res2 = $stmt2 -> execute([
+            'userid' => $username,
+            'status' => 1
+
+          ]);
+
+       }catch(Exception $e){
+        echo 'Exception ->';
+        var_dump($e->getMessage());
+
+        ?> <div class="alert alert-danger">
+              <strong>database error!</strong>
+            </div>
+            <?php
+
+       }
+
 
 
     }
@@ -124,6 +152,16 @@ $users = $stmt -> fetchAll();
 </head>
 <body>
 
+  <div class="topnav">
+  <form action="dellogin.php" method="post">
+            <input type="text" name="lusername" placeholder="username">
+            <input type="text" name="lpassword" placeholder="password">
+            <button type="submit" name="submit1">Login</button>
+
+
+          </form>
+</div>
+
 <div class="container">
     <h2>Add new students</h2>
 
@@ -153,7 +191,56 @@ $users = $stmt -> fetchAll();
           </div>
 <?php
       }
+
+
+
+
+      
+
+
+
+
+
 ?>
+
+
+
+<?php 
+
+
+ $fullUrl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+if(strpos($fullUrl, "login=empty")){
+    $login_empty = true;
+}elseif(strpos($fullUrl, "login=invalidname")){
+$login_invalid_name = true;
+
+}elseif(strpos($fullUrl, "login=invalidpassword")){
+$login_invalid_password = true;
+
+}
+
+ if($login_empty){
+          ?><div class="alert alert-danger">
+              <strong>Fill all required fields!</strong> 
+            </div> <?php
+      }elseif($login_invalid_name){
+                    ?><div class="alert alert-danger">
+                        <strong>Invalid name!</strong> 
+                      </div> <?php
+
+      }elseif($login_invalid_password){                
+          ?><div class="alert alert-danger">
+                        <strong>invalid password!</strong> 
+                      </div><?php
+                    }
+                    ?>
+
+
+
+
+
+
+
 
 <form action="delindex.php" method="get">
     <div class="form-group">
