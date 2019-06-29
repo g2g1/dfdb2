@@ -1,6 +1,6 @@
 <?php
 $dbusername = "root";
-$dbpassword = "gg.pass1.phpassass1n.";
+$dbpassword = "";
 $dbhostname = "localhost";
 $dbname = "login";
 
